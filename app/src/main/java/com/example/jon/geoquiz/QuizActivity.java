@@ -4,6 +4,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -13,6 +14,10 @@ import android.content.Intent;
 
 
 public class QuizActivity extends ActionBarActivity {
+
+    private static final String TAG = "QuizActivity";
+    private static final String KEY_INDEX = "index";
+    private static final String KEY_CHEATER = "cheater";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -28,6 +33,7 @@ public class QuizActivity extends ActionBarActivity {
             new TrueFalse(R.string.question_americas, true),
             new TrueFalse(R.string.question_asia, true)
     };
+
 
     private int mCurrentIndex = 0;
 
@@ -70,8 +76,19 @@ public class QuizActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            mIsCheater = savedInstanceState.getBoolean(KEY_CHEATER, false);
+        }
+
+
+        Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_quiz);
 
+        TextView android_version;
+        android_version = (TextView) findViewById(R.id.android_version);
+        android_version.setText("API level " + android.os.Build.VERSION.RELEASE);
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
 
         mCheatButton = (Button)findViewById(R.id.cheat_button);
@@ -119,6 +136,7 @@ public class QuizActivity extends ActionBarActivity {
                 else {
                     mCurrentIndex = mQuestionBank.length - 1;
                 }
+                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -129,9 +147,19 @@ public class QuizActivity extends ActionBarActivity {
                 updateQuestion();
             }
         });
+
+
+
         updateQuestion();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(TAG, "onSaveInstanceState");
+        savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+        savedInstanceState.putBoolean(KEY_CHEATER, mIsCheater);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
